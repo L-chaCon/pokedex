@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/L-chaCon/pokedex/internal/pokecache"
 )
 
 type LocationAreasResponse struct {
@@ -19,13 +17,13 @@ type LocationAreasResponse struct {
 	} `json:"results"`
 }
 
-func (c *Client) GetLocationAreas(pageURL *string, cache *pokecache.Cache) (LocationAreasResponse, error) {
+func (c *Client) GetLocationAreas(pageURL *string) (LocationAreasResponse, error) {
 	url := baseURL + "/location-area"
 	if pageURL != nil {
 		url = *pageURL
 	}
 
-	locations, ok := cache.Get(url)
+	locations, ok := c.pokeCache.Get(url)
 	if ok {
 		locationsRes := LocationAreasResponse{}
 		err := json.Unmarshal(locations, &locationsRes)
@@ -64,7 +62,7 @@ func (c *Client) GetLocationAreas(pageURL *string, cache *pokecache.Cache) (Loca
 	if err != nil {
 		return LocationAreasResponse{}, fmt.Errorf("Failed to marshal locationsRes: %w", err)
 	}
-	cache.Add(url, jsonBytes)
+	c.pokeCache.Add(url, jsonBytes)
 
 	return locationsRes, nil
 }
