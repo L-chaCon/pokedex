@@ -1,10 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"github.com/L-chaCon/pokedex/internal/config"
-	"github.com/L-chaCon/pokedex/internal/pokeapi"
 	"os"
+
+	"github.com/L-chaCon/pokedex/internal/config"
 )
 
 type cliCommand struct {
@@ -28,7 +29,7 @@ func getCommands() map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "Displays page of map locations",
-			callback:    commandMap,
+			callback:    commandMapF,
 		},
 		"mapb": {
 			name:        "mapb",
@@ -38,13 +39,13 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func commandExit(c *config.Config) error {
+func commandExit(cfg *config.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *config.Config) error {
+func commandHelp(cfg *config.Config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -54,18 +55,35 @@ func commandHelp(c *config.Config) error {
 	return nil
 }
 
-func commandMap(c *config.Config) error {
-	err := pokeapi.NextLocationAreaPage(c)
+func commandMapF(cfg *config.Config) error {
+	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.NextLocationsURL)
 	if err != nil {
-		return fmt.Errorf("%w", err)
+		return fmt.Errorf("Error running Mapf: %w", err)
+	}
+	cfg.NextLocationsURL = locationList.Next
+	cfg.PrevLocationsURL = locationList.Previous
+
+	for _, location := range locationList.Results {
+		fmt.Println(location.Name)
 	}
 	return nil
 }
 
-func commandMapB(c *config.Config) error {
-	err := pokeapi.PreviousLocationAreasPage(c)
-	if err != nil {
-		return fmt.Errorf("%w", err)
+func commandMapB(cfg *config.Config) error {
+	if cfg.PrevLocationsURL == nil {
+		return errors.New("You're on the first page")
 	}
+
+	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.PrevLocationsURL)
+	if err != nil {
+		return fmt.Errorf("Error running Mapb: %w", err)
+	}
+	cfg.NextLocationsURL = locationList.Next
+	cfg.PrevLocationsURL = locationList.Previous
+
+	for _, location := range locationList.Results {
+		fmt.Println(location.Name)
+	}
+
 	return nil
 }
