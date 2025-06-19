@@ -3,16 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/L-chaCon/pokedex/internal/config"
 	"os"
 	"strings"
 )
 
-type config struct {
-	Next    string
-	Preview string
-}
-
-var BaseConfig config
+var BaseConfig config.Config
 
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)

@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/L-chaCon/pokedex/internal/config"
+	"github.com/L-chaCon/pokedex/internal/pokeapi"
 	"os"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config.Config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -25,19 +27,24 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "Displays all the posible map locations",
+			description: "Displays page of map locations",
 			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Go back a page of map locations",
+			callback:    commandMapB,
 		},
 	}
 }
 
-func commandExit(c *config) error {
+func commandExit(c *config.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *config.Config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -47,6 +54,18 @@ func commandHelp(c *config) error {
 	return nil
 }
 
-func commandMap(c *config) error {
+func commandMap(c *config.Config) error {
+	err := pokeapi.NextLocationAreaPage(c)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+	return nil
+}
+
+func commandMapB(c *config.Config) error {
+	err := pokeapi.PreviousLocationAreasPage(c)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
 	return nil
 }
