@@ -56,7 +56,7 @@ func commandHelp(cfg *config.Config) error {
 }
 
 func commandMapF(cfg *config.Config) error {
-	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.NextLocationsURL)
+	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.NextLocationsURL, cfg.PokeCach)
 	if err != nil {
 		return fmt.Errorf("Error running Mapf: %w", err)
 	}
@@ -74,7 +74,7 @@ func commandMapB(cfg *config.Config) error {
 		return errors.New("You're on the first page")
 	}
 
-	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.PrevLocationsURL)
+	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.PrevLocationsURL, cfg.PokeCach)
 	if err != nil {
 		return fmt.Errorf("Error running Mapb: %w", err)
 	}
