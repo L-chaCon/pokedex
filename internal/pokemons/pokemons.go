@@ -1,23 +1,26 @@
 package pokemons
 
 import (
+	"fmt"
+
 	"github.com/L-chaCon/pokedex/internal/pokeapi"
 )
 
-func NewPokedex() Pokedex {
-	return Pokedex{make(map[string]Pokemon)}
+type Pokedex struct {
+	pokemons map[string]pokeapi.Pokemon
 }
 
-func (p *Pokedex) Add(name string, pokemon Pokemon) {
+func NewPokedex() Pokedex {
+	return Pokedex{make(map[string]pokeapi.Pokemon)}
+}
+
+func (p *Pokedex) Add(name string, pokemon pokeapi.Pokemon) {
 	p.pokemons[name] = pokemon
 }
 
-func ConvertFromAPIPokemon(pokemonAPI pokeapi.Pokemon) (Pokemon, error) {
-	var pokemon Pokemon
-
-	pokemon.Name = pokemonAPI.Name
-	pokemon.Height = pokemonAPI.Height
-	pokemon.Weight = pokemonAPI.Weight
-
-	return pokemon, nil
+func (p *Pokedex) PrintPokemons() {
+	fmt.Println("This is your Pokedex:")
+	for pokemonName, pokemon := range p.pokemons {
+		fmt.Printf("%s: %v\n", pokemonName, pokemon.BaseExperience)
+	}
 }

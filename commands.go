@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/L-chaCon/pokedex/internal/config"
-	"github.com/L-chaCon/pokedex/internal/pokemons"
 )
 
 type cliCommand struct {
@@ -39,14 +38,19 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapB,
 		},
 		"explore": {
-			name:        "explore",
+			name:        "explore <location name>",
 			description: "Shows list of pokemon in a area",
 			callback:    commandExplore,
 		},
 		"catch": {
-			name:        "catch",
+			name:        "catch <pokemon>",
 			description: "Try to catch a pokemon",
 			callback:    commandCatch,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Print the poxedex that you have",
+			callback:    commandPrintDex,
 		},
 	}
 
@@ -135,15 +139,16 @@ func commandCatch(cfg *config.Config, args ...string) error {
 	}
 
 	if pokemonInfo.BaseExperience < rand.IntN(cfg.RandomRoof) {
-		pokemonAdd, err := pokemons.ConvertFromAPIPokemon(pokemonInfo)
-		if err != nil {
-			return fmt.Errorf("Error converting pokemon: %w", err)
-		}
-		cfg.Pokedex.Add(pokemonInfo.Name, pokemonAdd)
+		cfg.Pokedex.Add(pokemonInfo.Name, pokemonInfo)
 		fmt.Println("Captured ;)")
 	} else {
 		fmt.Println("BAD LUCK!")
 	}
 
+	return nil
+}
+
+func commandPrintDex(cfg *config.Config, args ...string) error {
+	cfg.Pokedex.PrintPokemons()
 	return nil
 }
