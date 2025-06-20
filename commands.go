@@ -11,7 +11,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config.Config, string) error
+	callback    func(*config.Config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -45,13 +45,13 @@ func getCommands() map[string]cliCommand {
 
 }
 
-func commandExit(cfg *config.Config, p string) error {
+func commandExit(cfg *config.Config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config.Config, p string) error {
+func commandHelp(cfg *config.Config, args ...string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -61,7 +61,7 @@ func commandHelp(cfg *config.Config, p string) error {
 	return nil
 }
 
-func commandMapF(cfg *config.Config, p string) error {
+func commandMapF(cfg *config.Config, args ...string) error {
 	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.NextLocationsURL)
 	if err != nil {
 		return fmt.Errorf("Error running Mapf: %w", err)
@@ -75,7 +75,7 @@ func commandMapF(cfg *config.Config, p string) error {
 	return nil
 }
 
-func commandMapB(cfg *config.Config, p string) error {
+func commandMapB(cfg *config.Config, args ...string) error {
 	if cfg.PrevLocationsURL == nil {
 		return errors.New("You're on the first page")
 	}
@@ -94,10 +94,15 @@ func commandMapB(cfg *config.Config, p string) error {
 	return nil
 }
 
-func commandExplore(cfg *config.Config, p string) error {
-	fmt.Printf("Exploring %s...\n", p)
+func commandExplore(cfg *config.Config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("You must provide a location name")
+	}
+	location := args[0]
 
-	locationDetails, err := cfg.PokeapiClient.GetLocationDetails(p)
+	fmt.Printf("Exploring %s...\n", location)
+
+	locationDetails, err := cfg.PokeapiClient.GetLocationDetails(location)
 	if err != nil {
 		return fmt.Errorf("Error in GetLocationDetails: %w", err)
 	}

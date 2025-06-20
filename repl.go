@@ -18,15 +18,15 @@ func startRepl(cfg *config.Config) {
 		if len(words) == 0 {
 			continue
 		}
-		var parameters string = ""
+		args := []string{}
 		if len(words) > 1 {
-			parameters = words[1]
+			args = words[1:]
 		}
 
 		commandWord := words[0]
 		command, exist := getCommands()[commandWord]
 		if exist {
-			err := command.callback(cfg, parameters)
+			err := command.callback(cfg, args...)
 			if err != nil {
 				fmt.Printf("Error in callback: %v\n", err)
 			}

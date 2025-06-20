@@ -25,7 +25,6 @@ func (c *Client) GetLocationDetails(locationName string) (LocationAreaDetail, er
 	url := baseURL + "/location-area/" + locationName
 	locations, ok := c.pokeCache.Get(url)
 	if ok {
-		fmt.Println("--- USING CACHE ---")
 		locationsRes := LocationAreaDetail{}
 		err := json.Unmarshal(locations, &locationsRes)
 		if err != nil {
