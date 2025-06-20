@@ -7,20 +7,6 @@ import (
 	"net/http"
 )
 
-type LocationAreaDetail struct {
-	Name     string `json:"name"`
-	Location struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"location"`
-	PokemonEncounters []struct {
-		Pokemon struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"pokemon"`
-	} `json:"pokemon_encounters"`
-}
-
 func (c *Client) GetLocationDetails(locationName string) (LocationAreaDetail, error) {
 	url := baseURL + "/location-area/" + locationName
 	locations, ok := c.pokeCache.Get(url)

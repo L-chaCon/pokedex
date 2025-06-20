@@ -3,9 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"os"
 
 	"github.com/L-chaCon/pokedex/internal/config"
+	"github.com/L-chaCon/pokedex/internal/pokemons"
 )
 
 type cliCommand struct {
@@ -40,6 +42,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Shows list of pokemon in a area",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Try to catch a pokemon",
+			callback:    commandCatch,
 		},
 	}
 
@@ -109,6 +116,33 @@ func commandExplore(cfg *config.Config, args ...string) error {
 
 	for _, encounter := range locationDetails.PokemonEncounters {
 		fmt.Printf("\t- %s\n", encounter.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *config.Config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("You must provide a pokemon to catch")
+	}
+	pokemon := args[0]
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon)
+
+	pokemonInfo, err := cfg.PokeapiClient.GetPokemon(pokemon)
+	if err != nil {
+		return fmt.Errorf("Error in GetPokemon: %w", err)
+	}
+
+	if pokemonInfo.BaseExperience < rand.IntN(cfg.RandomRoof) {
+		pokemonAdd, err := pokemons.ConvertFromAPIPokemon(pokemonInfo)
+		if err != nil {
+			return fmt.Errorf("Error converting pokemon: %w", err)
+		}
+		cfg.Pokedex.Add(pokemonInfo.Name, pokemonAdd)
+		fmt.Println("Captured ;)")
+	} else {
+		fmt.Println("BAD LUCK!")
 	}
 
 	return nil
