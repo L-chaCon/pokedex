@@ -18,9 +18,14 @@ func (p *Pokedex) Add(name string, pokemon pokeapi.Pokemon) {
 	p.pokemons[name] = pokemon
 }
 
+func (p *Pokedex) Get(name string) (pokeapi.Pokemon, bool) {
+	value, ok := p.pokemons[name]
+	return value, ok
+}
+
 func (p *Pokedex) PrintPokemons() {
 	fmt.Println("This is your Pokedex:")
-	for pokemonName, pokemon := range p.pokemons {
-		fmt.Printf("%s: %v\n", pokemonName, pokemon.BaseExperience)
+	for pokemonName, _ := range p.pokemons {
+		fmt.Printf(" - %s\n", pokemonName)
 	}
 }

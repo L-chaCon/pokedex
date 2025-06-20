@@ -52,6 +52,11 @@ func getCommands() map[string]cliCommand {
 			description: "Print the poxedex that you have",
 			callback:    commandPrintDex,
 		},
+		"inspect": {
+			name:        "inspect <pokemon>",
+			description: "Inspect the information of a pokemon",
+			callback:    commandInspect,
+		},
 	}
 
 }
@@ -150,5 +155,30 @@ func commandCatch(cfg *config.Config, args ...string) error {
 
 func commandPrintDex(cfg *config.Config, args ...string) error {
 	cfg.Pokedex.PrintPokemons()
+	return nil
+}
+
+func commandInspect(cfg *config.Config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("You must provide a pokemon to inspect")
+	}
+	pokemon := args[0]
+
+	value, ok := cfg.Pokedex.Get(pokemon)
+	if !ok {
+		return errors.New("You have not caught that pokemon")
+	}
+
+	fmt.Printf("Name: %s\n", value.Name)
+	fmt.Printf("Height: %d\n", value.Height)
+	fmt.Printf("Weight: %d\n", value.Weight)
+	fmt.Println("Stats:")
+	for _, value := range value.Stats {
+		fmt.Printf(" - %s: %d\n", value.Stat.Name, value.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, value := range value.Types {
+		fmt.Printf(" - %s\n", value.Type.Name)
+	}
 	return nil
 }
