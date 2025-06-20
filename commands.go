@@ -11,7 +11,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config.Config) error
+	callback    func(*config.Config, string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -36,16 +36,22 @@ func getCommands() map[string]cliCommand {
 			description: "Go back a page of map locations",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Shows list of pokemon in a area",
+			callback:    commandExplore,
+		},
 	}
+
 }
 
-func commandExit(cfg *config.Config) error {
+func commandExit(cfg *config.Config, p string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config.Config) error {
+func commandHelp(cfg *config.Config, p string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -55,7 +61,7 @@ func commandHelp(cfg *config.Config) error {
 	return nil
 }
 
-func commandMapF(cfg *config.Config) error {
+func commandMapF(cfg *config.Config, p string) error {
 	locationList, err := cfg.PokeapiClient.GetLocationAreas(cfg.NextLocationsURL)
 	if err != nil {
 		return fmt.Errorf("Error running Mapf: %w", err)
@@ -69,7 +75,7 @@ func commandMapF(cfg *config.Config) error {
 	return nil
 }
 
-func commandMapB(cfg *config.Config) error {
+func commandMapB(cfg *config.Config, p string) error {
 	if cfg.PrevLocationsURL == nil {
 		return errors.New("You're on the first page")
 	}
@@ -83,6 +89,21 @@ func commandMapB(cfg *config.Config) error {
 
 	for _, location := range locationList.Results {
 		fmt.Println(location.Name)
+	}
+
+	return nil
+}
+
+func commandExplore(cfg *config.Config, p string) error {
+	fmt.Printf("Exploring %s...\n", p)
+
+	locationDetails, err := cfg.PokeapiClient.GetLocationDetails(p)
+	if err != nil {
+		return fmt.Errorf("Error in GetLocationDetails: %w", err)
+	}
+
+	for _, encounter := range locationDetails.PokemonEncounters {
+		fmt.Printf("\t- %s\n", encounter.Pokemon.Name)
 	}
 
 	return nil

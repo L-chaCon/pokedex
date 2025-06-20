@@ -58,11 +58,7 @@ func (c *Client) GetLocationAreas(pageURL *string) (LocationAreasResponse, error
 		return LocationAreasResponse{}, fmt.Errorf("Not able to read body: %w", err)
 	}
 
-	jsonBytes, err := json.Marshal(locationsRes)
-	if err != nil {
-		return LocationAreasResponse{}, fmt.Errorf("Failed to marshal locationsRes: %w", err)
-	}
-	c.pokeCache.Add(url, jsonBytes)
+	c.pokeCache.Add(url, body)
 
 	return locationsRes, nil
 }
